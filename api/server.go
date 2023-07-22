@@ -6,30 +6,33 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/gin-gonic/gin"
 
-	"github.com/mniudanri/go-auth-paseto/api/models"
+	"github.com/mniudanri/go-auth-paseto/api/model"
 )
 
-func InitServer() (*model.Server) {
-
-	router := gin.Default()
-	
-	// list routes
-	router.GET("/users", sampleProcess)
-
-	Start(router)
-
-	server := &model.Server{
-		Router: router,
-	}
-	return server
-}
-
-func Start(router *gin.Engine) {
-	err := router.Run("0.0.0.0:8080")
+func StartService(server *model.Server) {
+	err := server.Router.Run("0.0.0.0:8080")
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start server")
 	}
+}
+
+func DefineRoutes(server *model.Server) {
+	// list Routes
+	server.Router.GET("/users", sampleProcess)
+}
+
+func InitServer() (*model.Server) {
+
+	server := &model.Server{
+		Router: gin.Default(),
+	}
+
+	DefineRoutes(server)
+
+	StartService(server)
+
+	return server
 }
 
 func sampleProcess(ctx *gin.Context) {
