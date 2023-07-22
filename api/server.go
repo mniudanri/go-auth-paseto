@@ -7,10 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/mniudanri/go-auth-paseto/api/model"
+	"github.com/mniudanri/go-auth-paseto/util"
 )
 
-func StartService(server *model.Server) {
-	err := server.Router.Run("0.0.0.0:8080")
+func StartService(server *model.Server, config util.Config) {
+	err := server.Router.Run(config.Host)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start server")
@@ -22,7 +23,7 @@ func DefineRoutes(server *model.Server) {
 	server.Router.GET("/users", sampleProcess)
 }
 
-func InitServer() (*model.Server) {
+func InitServer(config util.Config) (*model.Server) {
 
 	server := &model.Server{
 		Router: gin.Default(),
@@ -30,7 +31,7 @@ func InitServer() (*model.Server) {
 
 	DefineRoutes(server)
 
-	StartService(server)
+	StartService(server, config)
 
 	return server
 }
