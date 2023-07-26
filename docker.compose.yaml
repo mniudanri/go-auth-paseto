@@ -6,6 +6,8 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=testdb
+    networks:
+      - go-auth-paseto
   go-auth-paseto:
     build:
       context: .
@@ -22,3 +24,5 @@ services:
         "--",
       ]
     command: [ "/build/go-auth-paseto" ]
+    networks:
+      - go-auth-paseto
