@@ -5,6 +5,7 @@ stop_postgres:
 	docker stop postgres13
 
 remove_postgres:
+	docker stop postgres13
 	docker rm postgres13
 
 create_db:
@@ -12,3 +13,12 @@ create_db:
 
 drop_db:
 	docker exec -it postgres13 dropdb simple_bank
+
+sqlc:
+	@if [["$(shell docker images -q kjconroy/sqlc:latest)" == ""]]; then \
+		($(shell docker pull kjconroy/sqlc)) \
+	fi \
+	
+	docker run --rm -v $(PWD):/src -w /src kjconroy/sqlc generate
+
+.PHONY: sqlc
