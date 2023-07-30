@@ -14,6 +14,12 @@ create_db:
 drop_db:
 	docker exec -it postgres13 dropdb simple_bank
 
+migrate_up:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
+
+migrate_down:
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+
 sqlc:
 	@if [["$(shell docker images -q kjconroy/sqlc:latest)" == ""]]; then \
 		($(shell docker pull kjconroy/sqlc)) \
