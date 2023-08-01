@@ -1,16 +1,24 @@
 package api
 
 import (
-	"net/http"
+	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 
-	"github.com/mniudanri/go-auth-paseto/api/model"
+	db "github.com/mniudanri/go-auth-paseto/db/sqlc"
+	"github.com/mniudanri/go-auth-paseto/token"
 	"github.com/mniudanri/go-auth-paseto/util"
 )
 
-func StartService(server *model.Server, config util.Config) {
+type Server struct {
+	Router     *gin.Engine
+	Config     util.Config
+	Store      db.Store
+	TokenMaker token.Maker
+}
+
+func StartService(server *Server, config util.Config) {
 	err := server.Router.Run(config.Host)
 
 	if err != nil {
@@ -18,25 +26,31 @@ func StartService(server *model.Server, config util.Config) {
 	}
 }
 
-func DefineRoutes(server *model.Server) {
+func DefineRoutes(server *Server) {
 	// list Routes
-	server.Router.GET("/users", sampleProcess)
+	server.Router.POST("/auth/login", server.LoginUser)
+	server.Router.POST("/user", server.CreateUser)
 }
 
-func InitServer(config util.Config) (*model.Server) {
+func GenerateToken(config util.Config) token.Maker {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		log.Warn().Msg(fmt.Sprint("cannot create token maker: %w", err))
+	}
 
-	server := &model.Server{
-		Router: gin.Default(),
+	return tokenMaker
+}
+
+func InitServer(config util.Config) *Server {
+	server := &Server{
+		Router:     gin.Default(),
+		TokenMaker: GenerateToken(config),
+		Store:      db.CreateConnection(config),
+		Config:     config,
 	}
 
 	DefineRoutes(server)
-
 	StartService(server, config)
 
 	return server
-}
-
-func sampleProcess(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"message": "sample message!"})
-	return
 }
