@@ -6,9 +6,12 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=testdb
+    ports:
+      - "5432:5432"
     networks:
-      - go-auth-paseto
-  go-auth-paseto:
+      testenv: {}
+  app:
+    image: golang:alpine
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,13 +19,10 @@ services:
       - "8080:8080"
     environment:
       - DB_SOURCE=postgresql://root:secret@postgres:5432/testdb?sslmode=disable
-    depends_on:
-      - postgres
-    entrypoint:
-      [
-        "postgres:5432",
-        "--",
-      ]
-    command: [ "/build/go-auth-paseto" ]
+    restart: on-failure
     networks:
-      - go-auth-paseto
+      testenv: {}
+networks:
+  testenv:
+    external: true
+    name: testenv
