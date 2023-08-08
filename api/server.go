@@ -6,9 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
+	"github.com/mniudanri/go-auth-paseto/api/middleware"
 	db "github.com/mniudanri/go-auth-paseto/db/sqlc"
 	"github.com/mniudanri/go-auth-paseto/token"
 	"github.com/mniudanri/go-auth-paseto/util"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -25,13 +29,18 @@ func StartService(server *Server, config util.Config) {
 		log.Fatal().Err(err).Msg("cannot start server")
 	}
 }
-
 func DefineRoutes(server *Server) {
-	// list Routes
-	server.Router.POST("/auth/login", server.LoginUser)
-	server.Router.POST("/user", server.CreateUser)
-}
+	v1 := server.Router.Group("/v1")
+	{
+		// list Routes
+		v1.POST("/auth/login", server.LoginUser)
+		v1.POST("/user", server.CreateUser)
 
+		authRoutes := v1.Group("/").Use(middleware.AuthMiddleware(server.TokenMaker))
+		authRoutes.GET("/user/:username", server.GetUserByUsername)
+	}
+	server.Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+}
 func GenerateToken(config util.Config) token.Maker {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
@@ -40,7 +49,6 @@ func GenerateToken(config util.Config) token.Maker {
 
 	return tokenMaker
 }
-
 func InitServer(config util.Config) *Server {
 	server := &Server{
 		Router:     gin.Default(),

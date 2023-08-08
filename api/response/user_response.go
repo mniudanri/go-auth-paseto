@@ -6,6 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type Response200 struct {
+	Code    int    `json:"code" example:"200"`
+	Message string `json:"message" example:"success"`
+}
+
 type UserResponse struct {
 	Username          string    `json:"username"`
 	FullName          string    `json:"full_name"`

@@ -1,0 +1,146 @@
+basePath: /v1
+definitions:
+  db.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      hashed_password:
+        type: string
+      is_email_verified:
+        type: boolean
+      password_changed_at:
+        type: string
+      username:
+        type: string
+    type: object
+  payload.LoginUserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  response.Error400:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  response.Error500:
+    properties:
+      code:
+        example: 500
+        type: integer
+      message:
+        example: server error
+        type: string
+    type: object
+  response.LoginUserResponse:
+    properties:
+      access_token:
+        type: string
+      access_token_expires_at:
+        type: string
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      session_id:
+        type: string
+      user:
+        $ref: '#/definitions/response.UserResponse'
+    type: object
+  response.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      password_changed_at:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Specification for APIs
+  termsOfService: http://swagger.io/terms/
+  title: API Specification
+  version: "1.0"
+paths:
+  /v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: validate user login and return token
+      parameters:
+      - description: Login User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/payload.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.LoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error400'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error500'
+      summary: Login user
+      tags:
+      - User
+  /v1/user/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Get user based on username
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error400'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Error500'
+      summary: Get user by username
+      tags:
+      - User
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

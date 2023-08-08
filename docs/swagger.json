@@ -1,0 +1,221 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Specification for APIs",
+        "title": "API Specification",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/v1",
+    "paths": {
+        "/v1/auth/login": {
+            "post": {
+                "description": "validate user login and return token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "Login User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.LoginUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.LoginUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error400"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error500"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/{username}": {
+            "get": {
+                "description": "Get user based on username",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by username",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error400"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Error500"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "db.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "hashed_password": {
+                    "type": "string"
+                },
+                "is_email_verified": {
+                    "type": "boolean"
+                },
+                "password_changed_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "payload.LoginUserRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.Error400": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "example": "status bad request"
+                }
+            }
+        },
+        "response.Error500": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 500
+                },
+                "message": {
+                    "type": "string",
+                    "example": "server error"
+                }
+            }
+        },
+        "response.LoginUserResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "access_token_expires_at": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "refresh_token_expires_at": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/response.UserResponse"
+                }
+            }
+        },
+        "response.UserResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                },
+                "password_changed_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}
