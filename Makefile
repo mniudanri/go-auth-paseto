@@ -26,7 +26,7 @@ create_db:
 
 # remove db from postgre image
 drop_db:
-	docker exec -it postgres13 dropdb testdb
+	docker exec -it postgres dropdb testdb
 
 # run go migrate, create table structure and indexing to postgre, see query at ./db/migration/*.up.sql
 migrate_up:
@@ -65,11 +65,11 @@ sqlc:
 
 # APIs specification
 install_library:
-	gom mod tidy
+	go mod tidy
 
 # APIs specification
 swagger:
-	gom mod tidy
+	go mod tidy
 	swag init
 
 .PHONY: sqlc swagger network
